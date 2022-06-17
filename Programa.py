@@ -1,4 +1,5 @@
 from Ingresar_Datos import *
+from Tablas import Ingresar_Tabla, Ingresar_Valor, Mostrar_Tabla
 
 lista_productos = []
 
@@ -16,11 +17,15 @@ while opcion != 8:
 
     opcion = Ingresar_Entero("Ingrese opción de Menú: ", "Opción incorrecta.", 1, 8)
 
-    if opcion == 1:
-        print("hola")
-'''  elif opcion == 2:
+    if opcion == 2:
+        #cadena = Ingresar_Cadena("Ingrese nombre de la tabla: ")
+        #Ingresar_Tabla(cadena)
+        Ingresar_Valor()
+    elif opcion == 5:
+        Mostrar_Tabla()   
+'''elif opcion == 2:
 elif opcion == 3:
-elif opcion == 4:
-elif opcion == 5:
-elif opcion == 6:
+elif opcion == 4:'''
+    
+'''elif opcion == 6:
 elif opcion == 7:'''

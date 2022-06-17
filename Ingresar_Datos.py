@@ -1,7 +1,3 @@
-import sqlite3
-
-database = sqlite3.connect('C:\Users\agusm\OneDrive\Escritorio\Trabajo_Final_Super\Trabajo_Final')
-
 def Definir_Código(lista):
     if len(lista) == 0:
         codigo = 100
