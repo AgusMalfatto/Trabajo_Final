@@ -1,5 +1,6 @@
 from datetime import date
 
+# DEFINE EL CÓDIGO DE UN NUEVO PRODUCTO
 def Definir_Codigo(lista):
     if len(lista) == 0:
         codigo = 100
@@ -8,6 +9,7 @@ def Definir_Codigo(lista):
     
     return codigo
 
+# INGRESA UN NÚMERO ENTERO POR TECLADO EN RANGO MIN Y MAX
 def Ingresar_Entero(mensaje, mensaje_error, min, max):
     valor = 0
     while valor == 0:
@@ -20,6 +22,7 @@ def Ingresar_Entero(mensaje, mensaje_error, min, max):
     
     return numero
 
+# INGRESA UN NUMERO DECIMAL POR TECLADO ENTRE MIN Y MAX
 def Ingresar_Precio(mensaje, mensaje_error, min, max):
     valor = 0
     while valor == 0:
@@ -32,6 +35,7 @@ def Ingresar_Precio(mensaje, mensaje_error, min, max):
     
     return numero
 
+# INGRESA LA FECHA
 def Ingresar_Fecha():
     dia = Ingresar_Entero("Ingrese el día de vencimiento", "Día no válido (1 a 30)", 1, 30)
     mes = Ingresar_Entero("Ingrese el mes de vencimiento", "mes no válido (1 a 30)", 1, 12)
@@ -39,11 +43,13 @@ def Ingresar_Fecha():
     fecha = date((anio), mes, dia)
     return fecha
 
+# INGRESA UNA CADENA SIN RESTRICCIÓN
 def Ingresar_Cadena(mensaje):
     cadena = input(mensaje) 
 
     return cadena
 
+# INGRESA EL TIPO DE UN PRODUCTO, SE ENVÍAN LOS TIPOS VÁLIDOS COMO PARÁMETROS
 def Ingresar_Tipo(mensaje, mensaje_error, *args):
     valor = 0
     while valor == 0:

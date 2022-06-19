@@ -1,7 +1,8 @@
 from Ingresar_Datos import *
-from Tablas import Ingresar_Valor
+from Tablas import *
 
 
+# PERMITE INGRESAR LOS DATOS DE UN NUEVO PRODUCTO
 def Ingresar_Nuevo_Producto():
     '''codigo = Definir_Codigo(lista)'''
     descripcion = Ingresar_Cadena("\nIngrese la descripción del producto: ")
