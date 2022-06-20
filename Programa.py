@@ -1,9 +1,10 @@
-from Operaciones import *
+from Ventas import *
 
 Crear_DB()
 Crear_Tabla("PRODUCTOS")
 Crear_Tabla("VENCIDOS")
 Crear_Tabla_Pedidos()
+Crear_Tabla_Ordenes_Venta()
 lista_productos = []
 opcion = 0
 lista = [
@@ -25,9 +26,13 @@ while opcion != 9:
     print("8. ACTUALIZAR PRECIOS")
     print("9. SALIR DEL SISTEMA\n")
 
-    opcion = Ingresar_Entero("\nIngrese opción de Menú: ", "\nOpción incorrecta.", 1, 8)
-
-    if opcion == 3:
+    opcion = Ingresar_Entero("\nIngrese opción de Menú: ", "\nOpción incorrecta.", 1, 9)
+    
+    if opcion == 1:
+        Generar_Orden_de_Venta()
+    elif opcion == 2:
+        Menu_Ordenes_Ventas()
+    elif opcion == 3:
         Ingresar_Valores("PRODUCTOS", lista)
         #Ingresar_Nuevo_Producto()      
     elif opcion == 4:

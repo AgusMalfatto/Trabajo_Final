@@ -12,3 +12,10 @@ def Ingresar_Nuevo_Producto():
     '''tipo = Ingresar_Tipo("Ingrese el tipo del producto: ", "Tipo no válido", "Lacteos", )'''
     Ingresar_Valor("PRODUCTOS", 101, descripcion, cantidad, precio, fecha, 'L')
 
+# CONSULTA EL STOCK DE UN PRODUCTO. DEVUELVE LISTA DE TUPLA VACÍA SI NO HAY STOCK. DEVUELVE DATOS DEL PRODUCTO SI HAY STOCK.
+def Validar_Stock(prod):
+    consulta = []
+    stock = Consultar_Producto("PRODUCTOS", "Descripcion", prod)
+    if (len(stock) != 0) and stock[0][2] > 0:
+        consulta = stock
+    return consulta

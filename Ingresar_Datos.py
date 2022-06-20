@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 
 # DEFINE EL CÓDIGO DE UN NUEVO PRODUCTO
 def Definir_Codigo(lista):
@@ -55,7 +55,7 @@ def Ingresar_Tipo(mensaje, mensaje_error, *args):
     while valor == 0:
         try:
             cadena = input(mensaje)
-            assert cadena in args
+            assert cadena.lower() in args
             valor = 1
         except:
             print(mensaje_error)
