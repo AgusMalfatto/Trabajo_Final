@@ -2,13 +2,13 @@ from ast import If
 from Operaciones import *
 
 def Mostrar_una_Venta(prod):
-    print("{:<15} | {:<10} | {:<10} | ".format(prod[1], prod[2], prod[3]))
+    print("| {:^15} | {:^10} | {:^10} | ".format(prod[1], prod[2], prod[3]))
 
 def Mostrar_Una_Orden(orden):
-    print("{:<10} | {:<20} | {:<30} | {:<10} | {:<10} | {:<10} | {:<8} |".format(orden[0], orden[1], orden[2], orden[3], orden[4], orden[5], orden[6]))
+    print("| {:^10} | {:^20} | {:^30} | {:^10} | {:^10} | {:^10} | {:^8} |".format(orden[0], orden[1], orden[2], orden[3], orden[4], orden[5], orden[6]))
 
 def Numero_Orden_Venta():
-    orden = Seleccionar_Orden("MAX")
+    orden = Seleccionar_Orden("MAX", "Orden_de_Venta", "ORDENES_VENTA")
     if not(orden[0][0] is None):
         orden = orden[0][0] + 1
     else:
@@ -16,19 +16,20 @@ def Numero_Orden_Venta():
     return orden
 
 def Mostrar_Ticket(cantidad, lista):
-    print("{:<10} | {:<15} | {:<10} |".format(cantidad, lista[0][1], lista[0][3]))
+    print("| {:<10} | {:<15} | {:<10} |".format(cantidad, lista[0][1], lista[0][3]))
 
 # SOLICITA Y VALIDA DATOS PARA LOS PRODUCTOS QUE DESEE EL CLIENTE, LOS DEVUELVE EN LISTA
 def Generar_Venta():    
     venta = []
-    cadena = Ingresar_Cadena("\nIngrese el producto desea comprar: ")
-    stock_producto = Validar_Stock(cadena)
-    
-    if len(stock_producto) > 0:
-        cantidad = Ingresar_Entero("\nIngrese cantidad de unidades: ", "No hay stock suficiente", 1, stock_producto[0][2])
-        venta = [cadena, cantidad]
-    else:
-        print(f"No hay stock suficiente de {cadena}")
+    while len(venta) == 0:
+        cadena = Ingresar_Cadena("\nIngrese el producto desea comprar: ")
+        stock_producto = Validar_Stock(cadena)
+        
+        if len(stock_producto) > 0:
+            cantidad = Ingresar_Entero("\nIngrese cantidad de unidades: ", "No hay stock suficiente", 1, stock_producto[0][2])
+            venta = [cadena, cantidad]
+        else:
+            print(f"No hay stock suficiente de {cadena}")
     return venta
     
 # RECIBE LA LISTA DE PRODUCTOS QUE DESEA EL CLIENTE Y LOS DATOS DEL CLIENTE. 
@@ -38,11 +39,11 @@ def Procesar_Venta(lista, orden):
     hora = datetime.now()
     dia = date.today()
     print("\n*******************************************")
-    print(f"\n{dia}  |  {hora.hour}:{hora.minute} hs")
-    print("\n{:<10} | {:<15} | {:<10} |".format("CANTIDAD", "PRODUCTO", "PRECIO U."))
+    print(f"| {dia} |  {hora.hour}:{hora.minute} hs")
+    print("\n| {:<10} | {:<15} | {:<10} |".format("CANTIDAD", "PRODUCTO", "PRECIO U."))
 
     for producto in lista: # RECORRO LA LISTA DE PRODUCTOS
-        datos_producto = Validar_Stock(producto[0]) 
+        datos_producto = Validar_Stock(producto[0])        
         Mostrar_Ticket(producto[1], datos_producto)
 
     print(f"\nTOTAL DE COMPRA: ${total_precio[0][0]}")
@@ -71,13 +72,14 @@ def Actualizar_BD_Pedido(lista_productos, orden):
         datos_producto = Validar_Stock(producto[0])
         pedido = [(orden, producto[0], producto[1], datos_producto[0][3] * producto[1])]
         Ingresar_Valores_Pedidos(pedido)
+        Modificar_Valores("PRODUCTOS", datos_producto[0][0], "Stock", datos_producto[0][2] - producto[1]) 
 
 # GENERA LA VENTA.
 def Generar_Orden_de_Venta():
     Mostrar_Tabla("PRODUCTOS")
     compra = []
     valor = 'si'
-    while valor == 'si':
+    while valor.lower() == 'si':
         un_producto = Generar_Venta()
         if len(un_producto) > 0:
             compra.append(un_producto)
@@ -93,19 +95,27 @@ def Mostrar_Ventas(orden):
     ventas = Consultar_Producto("PEDIDOS", "Orden_de_Venta", orden)
     cliente = Consultar_Producto("ORDENES_VENTA", "Orden_de_Venta", orden)
     print(f"\nPedido de {cliente[0][1]}")
-    print("\n{:<15} | {:<10} | {:<10} | ".format("PRODUCTO", "CANTIDAD", "PRECIO"))    
+    print("\n+ {:-<15} + {:-<10} + {:-<10} +".format("", "", "")) 
+    print("| {:^15} | {:^10} | {:^10} |".format("PRODUCTO", "CANTIDAD", "PRECIO"))    
+    print("+ {:-<15} + {:-<10} + {:-<10} +".format("", "", "")) 
     for prod in ventas:
         Mostrar_una_Venta(prod)
+    print("+ {:-<15} + {:-<10} + {:-<10} +".format("", "", "")) 
 
 
 def Mostrar_Ordenes_Venta():
     pedidos = Consultar_Tabla("ORDENES_VENTA")
-    print("\n{:<10} | {:<20} | {:<30} | {:<10} | {:<10} | {:<10} | {:<8} |".format("N° ORDEN", "CLIENTE", "DIRECCIÓN", "TELÉFONO", "BULTOS", "PRODUCTOS", "PRECIO"))
+    print("\n+ {:-<10} + {:-<20} + {:-<30} + {:-<10} + {:-<10} + {:-<10} + {:-<8} +".format("", "", "", "", "", "", ""))
+    print("| {:^10} | {:^20} | {:^30} | {:^10} | {:^10} | {:^10} | {:^8} |".format("N° ORDEN", "CLIENTE", "DIRECCIÓN", "TELÉFONO", "BULTOS", "PRODUCTOS", "PRECIO"))
+    print("+ {:-<10} + {:-<20} + {:-<30} + {:-<10} + {:-<10} + {:-<10} + {:-<8} +".format("", "", "", "", "", "", ""))
+
     for orden in pedidos:
         Mostrar_Una_Orden(orden)
+    print("+ {:-<10} + {:-<20} + {:-<30} + {:-<10} + {:-<10} + {:-<10} + {:-<8} +".format("", "", "", "", "", "", ""))
+
 
 def Consultar_Orden_Venta():
-    maximo = Seleccionar_Orden("MAX")
+    maximo = Seleccionar_Orden("MAX", "Orden_de_Venta", "ORDENES_VENTA")
     orden = Ingresar_Entero("Ingrese la orden de venta: ", "Orden de venta no válida", 100, maximo[0][0])
     Mostrar_Ventas(orden)
 

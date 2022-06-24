@@ -2,7 +2,7 @@ import sqlite3
 
 # MUESTRA UN SOLO PRODUCTO ENVÍADO COMO PARÁMETRO EN FORMA DE TUPLA
 def Mostrar_Un_Producto(prod):
-    print("{:<8} | {:<20} | {:<8} | {:<8} | {:<13} | {:<15}".format (prod[0], prod[1], prod[2], prod[3], prod[4], prod[5]))
+    print("| {:^8} | {:^20} | {:^8} | {:^8} | {:^13} | {:^15} |".format (prod[0], prod[1], prod[2], prod[3], prod[4], prod[5]))
 
 # CREA UNA BASE DE DATOS
 def Crear_DB():
@@ -16,7 +16,7 @@ def Crear_Tabla(nombre):
     cursor = database.cursor()
     cursor.execute(
         "CREATE TABLE IF NOT EXISTS " + nombre + """(
-            Codigo text,
+            Codigo integer,
             Descripcion text,
             Stock integer,
             Precio float,
@@ -101,6 +101,7 @@ def Sumar(tabla, columna, orden):
     comando = f"SELECT SUM({columna}) FROM {tabla} WHERE Orden_De_Venta = {orden}"
     cursor.execute(comando)
     producto = cursor.fetchall()
+    database.commit()
     database.close()
     return producto
 
@@ -114,19 +115,19 @@ def Ingresar_Valores(nombre, values):
     conexion.close()
 
 # MODIFICA UN ELEMENTO BASADO EN SU CÓDIGO, SE PASA EL ASPECTO A MODIFICAR Y SU NUEVO VALOR
-def Modificar_Valores(nombre, codigo, valor, nuevo_valor):
+def Modificar_Valores(tabla, codigo, columna, nuevo_valor):
     conexion = sqlite3.connect('Supermercado.db')
     cursor = conexion.cursor()
-    comando = f"UPDATE {nombre} SET {valor} = {nuevo_valor} WHERE Codigo = {codigo}"
+    comando = f"UPDATE {tabla} SET {columna} = {nuevo_valor} WHERE Codigo = {codigo}"
     cursor.execute(comando)
     conexion.commit()
     conexion.close()
 
 # ELIMINA UN ELEMENTO, SE ENVÍA EL NOMBRE DE LA TABLA Y EL CÓDIGO DEL ELEMENTO COMO PARÁMTERO
-def Eliminar_Valor(nombre, columna,  valor):
+def Eliminar_Valor(tabla, columna,  valor):
     conexion = sqlite3.connect('Supermercado.db')
     cursor = conexion.cursor()
-    comando = f"DELETE FROM {nombre} WHERE {columna} = {valor}"
+    comando = f"DELETE FROM {tabla} WHERE {columna} = {valor}"
     cursor.execute(comando)
     conexion.commit()
     conexion.close()
@@ -138,16 +139,18 @@ def Consultar_Producto(tabla, columna, valor):
     comando = f"SELECT * FROM {tabla} WHERE {columna} LIKE '{valor}'"
     cursor.execute(comando)
     producto = cursor.fetchall()
+    database.commit()
     database.close()
     return producto
 
 # DEVUELVE EL MÁXIMO O EL MÍNIMO VALOR DE LAS ORDENES DE VENTA
-def Seleccionar_Orden(valor):
+def Seleccionar_Orden(valor, columna, tabla):
     database = sqlite3.connect('Supermercado.db')
     cursor = database.cursor()
-    comando = f"SELECT {valor}(Orden_de_Venta) FROM ORDENES_VENTA"
+    comando = f"SELECT {valor}({columna}) FROM {tabla}"
     cursor.execute(comando)
     producto = cursor.fetchall()
+    database.commit()
     database.close()
     return producto
 
@@ -157,6 +160,7 @@ def Contar(tabla):
     comando = f"SELECT COUNT(*) FROM {tabla}"
     cursor.execute(comando)
     cantidad = cursor.fetchall()
+    database.commit()
     database.close()
     return cantidad
 
@@ -166,6 +170,7 @@ def Consultar_Tabla(tabla):
     comando = f"SELECT * FROM {tabla}"
     cursor.execute(comando)
     productos = cursor.fetchall()
+    database.commit()
     database.close()
     return productos
 
@@ -177,10 +182,13 @@ def Mostrar_Tabla(nombre):
     cursor.execute(comando)
 
     productos = cursor.fetchall()
-    print("\n{:<8} | {:<20} | {:<8} | {:<8} | {:<13} | {:<15}\n".format ("CÓDIGO", "DESCRIPCIÓN", "STOCK", "PRECIO", "VENCIMIENTO", "TIPO"))
-
+    database.commit()
+    database.close()
+    print("\n+ {:-<8} + {:-<20} + {:-<8} + {:-<8} + {:-<13} + {:-<15} +".format ("", "", "", "", "", ""))
+    print("| {:^8} | {:^20} | {:^8} | {:^8} | {:^13} | {:^15} |".format ("CÓDIGO", "DESCRIPCIÓN", "STOCK", "PRECIO", "VENCIMIENTO", "TIPO"))
+    print("+ {:-<8} + {:-<20} + {:-<8} + {:-<8} + {:-<13} + {:-<15} +".format ("", "", "", "", "", ""))
     for i in productos:
         Mostrar_Un_Producto(i)
 
-    database.close()
+    print("+ {:-<8} + {:-<20} + {:-<8} + {:-<8} + {:-<13} + {:-<15} +\n".format ("", "", "", "", "", ""))
 
