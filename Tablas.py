@@ -2,7 +2,7 @@ import sqlite3
 
 # MUESTRA UN SOLO PRODUCTO ENVÍADO COMO PARÁMETRO EN FORMA DE TUPLA
 def Mostrar_Un_Producto(prod):
-    print("| {:^8} | {:^20} | {:^8} | {:^8} | {:^13} | {:^15} |".format (prod[0], prod[1], prod[2], prod[3], prod[4], prod[5]))
+    print("| {:^8} | {:^20} | {:^8} | {:^8} | {:^13} | {:^10} | {:^15} |".format (prod[0], prod[1], prod[2], prod[3], prod[4], prod[5], prod[6]))
 
 # CREA UNA BASE DE DATOS
 def Crear_DB():
@@ -21,6 +21,7 @@ def Crear_Tabla(nombre):
             Stock integer,
             Precio float,
             Vencimiento date,
+            Descuento integer,
             Tipo text
         )      
         """
@@ -42,7 +43,8 @@ def Crear_Tabla_Ordenes_Venta():
             Telefono integer,
             Cantidad_Total integer,
             Cantidad_Prod integer,
-            Precio_Final float
+            Precio_Final float,
+            Entregado text
         )  
         """
     )    
@@ -66,10 +68,10 @@ def Crear_Tabla_Pedidos():
     database.close()
 
 # INGRESA UN SOLO VALOR CON CADA CAMPO ENVIADO COMO PARÁMTERO
-def Ingresar_Valor(nombre, codigo, descripcion, cantidad, precio, fecha, tipo):
+def Ingresar_Valor(nombre, codigo, descripcion, cantidad, precio, fecha, descuento, tipo):
     conexion = sqlite3.connect('Supermercado.db')
     cursor = conexion.cursor()
-    comando = f"INSERT INTO {nombre} VALUES ('{codigo}', '{descripcion}', '{cantidad}', '{precio}', '{fecha}', '{tipo}')"
+    comando = f"INSERT INTO {nombre} VALUES ('{codigo}', '{descripcion}', '{cantidad}', '{precio}', '{fecha}', '{descuento}', '{tipo}')"
     # Insertamos un registro en la tabla de usuarios
     cursor.execute(comando)
     # Guardamos los cambios haciendo un commit
@@ -80,7 +82,7 @@ def Ingresar_Valor(nombre, codigo, descripcion, cantidad, precio, fecha, tipo):
 def Ingresar_Valores_Ordenes_Venta(values):
     conexion = sqlite3.connect('Supermercado.db')
     cursor = conexion.cursor()
-    comando = f"INSERT INTO ORDENES_VENTA VALUES (?, ?, ?, ?, ?, ?, ?)"
+    comando = f"INSERT INTO ORDENES_VENTA VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
     cursor.executemany(comando, values)
     conexion.commit()
     conexion.close()
@@ -95,10 +97,10 @@ def Ingresar_Valores_Pedidos(values):
     conexion.close()
 
 # SUMA LOS ELEMENTO DE UNA TABLA DE UNA COLUMNA ENVÍADA COMO PARÁMETRO. RETORNA UN VALOR EN UNA TUPLA DENTRO DE UNA LISTA
-def Sumar(tabla, columna, orden):
+def Sumar(tabla, columna, columna_orden, orden):
     database = sqlite3.connect('Supermercado.db')
     cursor = database.cursor()
-    comando = f"SELECT SUM({columna}) FROM {tabla} WHERE Orden_De_Venta = {orden}"
+    comando = f"SELECT SUM({columna}) FROM {tabla} WHERE {columna_orden} = '{orden}'"
     cursor.execute(comando)
     producto = cursor.fetchall()
     database.commit()
@@ -109,16 +111,16 @@ def Sumar(tabla, columna, orden):
 def Ingresar_Valores(nombre, values):
     conexion = sqlite3.connect('Supermercado.db')
     cursor = conexion.cursor()
-    comando = f"INSERT INTO {nombre} VALUES (?, ?, ?, ?, ?, ?)"
+    comando = f"INSERT INTO {nombre} VALUES (?, ?, ?, ?, ?, ?, ?)"
     cursor.executemany(comando, values)
     conexion.commit()
     conexion.close()
 
 # MODIFICA UN ELEMENTO BASADO EN SU CÓDIGO, SE PASA EL ASPECTO A MODIFICAR Y SU NUEVO VALOR
-def Modificar_Valores(tabla, codigo, columna, nuevo_valor):
+def Modificar_Valores(tabla, codigo, columna, nuevo_valor, columna_codigo):
     conexion = sqlite3.connect('Supermercado.db')
     cursor = conexion.cursor()
-    comando = f"UPDATE {tabla} SET {columna} = {nuevo_valor} WHERE Codigo = {codigo}"
+    comando = f"UPDATE {tabla} SET {columna} = '{nuevo_valor}' WHERE {columna_codigo} = {codigo}"
     cursor.execute(comando)
     conexion.commit()
     conexion.close()
@@ -184,11 +186,11 @@ def Mostrar_Tabla(nombre):
     productos = cursor.fetchall()
     database.commit()
     database.close()
-    print("\n+ {:-<8} + {:-<20} + {:-<8} + {:-<8} + {:-<13} + {:-<15} +".format ("", "", "", "", "", ""))
-    print("| {:^8} | {:^20} | {:^8} | {:^8} | {:^13} | {:^15} |".format ("CÓDIGO", "DESCRIPCIÓN", "STOCK", "PRECIO", "VENCIMIENTO", "TIPO"))
-    print("+ {:-<8} + {:-<20} + {:-<8} + {:-<8} + {:-<13} + {:-<15} +".format ("", "", "", "", "", ""))
+    print("\n+ {:-<8} + {:-<20} + {:-<8} + {:-<8} + {:-<13} + {:-<10} + {:-<15} +".format ("", "", "", "", "", "", ""))
+    print("| {:^8} | {:^20} | {:^8} | {:^8} | {:^13} | {:^10} | {:^15} |".format ("CÓDIGO", "DESCRIPCIÓN", "STOCK", "PRECIO", "VENCIMIENTO", "DESCUENTO", "TIPO"))
+    print("+ {:-<8} + {:-<20} + {:-<8} + {:-<8} + {:-<13} + {:-<10} + {:-<15} +".format ("", "", "", "", "", "", ""))
     for i in productos:
         Mostrar_Un_Producto(i)
 
-    print("+ {:-<8} + {:-<20} + {:-<8} + {:-<8} + {:-<13} + {:-<15} +\n".format ("", "", "", "", "", ""))
+    print("+ {:-<8} + {:-<20} + {:-<8} + {:-<8} + {:-<13} + {:-<10} + {:-<15} +\n".format ("", "", "", "", "", "", ""))
 

@@ -19,8 +19,10 @@ def Ingresar_Nuevo_Producto():
     cantidad = Ingresar_Entero("Ingrese cantidad de productos: ", "Cantidad no válida", 1, 50)
     precio = Ingresar_Precio("Ingrese el precio del producto: ", "Precio no válido", 1, 30)
     fecha = Ingresar_Fecha()
+    descuento = Ingresar_Entero("\nIngrese el descuento del producto (en caso de no tener descuento ingrese 'cero'): ", "\n>> Descuento no válido.", 0, 90)
     for i in tipos:
         print(f"{i} - ", end="")
+
     tipo = Ingresar_Tipo("Ingrese el tipo del producto: ", "Tipo no válido", 
         "lacteos",
         "verduleria",
@@ -32,7 +34,8 @@ def Ingresar_Nuevo_Producto():
         "latas",
         "galletitas"
         )
-    Ingresar_Valor("PRODUCTOS", codigo, descripcion, cantidad, precio, fecha, tipo)
+
+    Ingresar_Valor("PRODUCTOS", codigo, descripcion.upper(), cantidad, precio, fecha, descuento, tipo)
 
 # CONSULTA EL STOCK DE UN PRODUCTO. DEVUELVE LISTA DE TUPLA VACÍA SI NO HAY STOCK. DEVUELVE DATOS DEL PRODUCTO SI HAY STOCK.
 def Validar_Stock(prod):
@@ -44,22 +47,43 @@ def Validar_Stock(prod):
 
 def Modificar(*args): # funcion, codigo, columna, 
     valor = args[0](args[3], args[4], args[5], args[6])
-    Modificar_Valores("PRODUCTOS", args[1], args[2], valor)
+    Modificar_Valores("PRODUCTOS", args[1], args[2], valor, "Codigo")
+
+def Calcular_Porcentaje(precio, porcentaje, codigo):
+    precio += (precio * porcentaje / 100)
+    Modificar_Valores("PRODUCTOS", codigo, "Precio", precio, "Codigo")
+
+def Menu_Modificar_Precio(codigo):
+    producto = Consultar_Producto("PRODUCTOS", "Codigo", codigo)
+    print("\n1. Colocar nuevo precio.")
+    print("2. Actualizar con porcentaje.")
+
+    opcion = Ingresar_Entero("Ingrese opción: ", ">> Opcion no válida", 1, 2)
+
+    if opcion == 1:
+        Modificar(Ingresar_Precio, codigo, "Precio", "Ingrese el nuevo precio: ", ">> Precio no válido.", 1, 30)
+    elif opcion == 2:
+        porcentaje = Ingresar_Entero("Ingrese el porcentaje de aumento: ", ">> Porcentaje no válido.", 1, 200)
+        Calcular_Porcentaje(producto[0][3], porcentaje, codigo)
+
 
 def Menu_Modificar(codigo):
     opcion = 0
 
-    while opcion != 3:
-        print("1. MODIFICAR STOCK.")
+    while opcion != 4:
+        print("\n1. MODIFICAR STOCK.")
         print("2. MODIFICAR PRECIO.")
-        print("3. VOLVER AL MENÚ PRINCIPAL.")
+        print("3. MODIFICAR DESCUENTO.")
+        print("4. VOLVER AL MENÚ PRINCIPAL.")
 
-        opcion = Ingresar_Entero("Ingrese opción de menú: ", "Opción de menú no válida.", 1, 3)
+        opcion = Ingresar_Entero("\nIngrese opción de menú: ", ">> Opción de menú no válida.", 1, 4)
 
         if opcion == 1:
-            Modificar(Ingresar_Entero, codigo, "Stock", "Ingresar el nuevo stock: ", "Valor no válido.", 1, 50)
+            Modificar(Ingresar_Entero, codigo, "Stock", "\nIngresar el nuevo stock: ", ">> Valor no válido.", 1, 50)
         elif opcion == 2:
-            Modificar(Ingresar_Precio, codigo, "Precio", "Ingrese el nuevo precio: ", "Precio no válido.", 1, 30)
+            Menu_Modificar_Precio(codigo)
+        elif opcion == 3:
+            Modificar(Ingresar_Entero, codigo, "Descuento", "\nIngresar el nuevo descuento", "\n>> Descuento no válido.", 0, 90)
 
 
 def Menu_Modificaciones():    
@@ -86,3 +110,76 @@ def Menu_Eliminar_Producto():
             valor = 1
         else:
             print(f">> No se encuentra producto en stock con códgio: {orden}")
+
+
+def Calcular_Descuento(precio_final, lista_productos):
+    for producto in lista_productos:
+        vencimiento = Consultar_Producto("PRODUCTOS", "Descripcion", producto[1])
+        vencimiento = str(vencimiento[0][4])
+        vencimiento = datetime.strptime(vencimiento, "%Y-%m-%d")
+        fecha_actual = datetime.today()
+        diferencia = vencimiento - fecha_actual
+        descuento = 0
+
+        if (diferencia.days <= 7):
+            descuento = 10
+            precio_final -= (descuento * precio_final) / 100
+            break
+
+    return (precio_final, descuento)
+
+
+def Articulo_Mas_Vendido(productos, tipo = 0):
+    dic = dict()
+    for un_producto in productos:
+        if not(un_producto[1] in dic):
+            suma_producto = Sumar("PEDIDOS", "Cantidad", "Descripcion", un_producto[1])
+            if suma_producto[0][0] != None:
+                dic[un_producto[1]] = suma_producto[0][0]
+    valores = list(dic.values()) 
+    if len(valores) > 0:
+        valor = max(valores)      
+        lista = list()
+        for i in dic:
+            if dic[i] == valor:
+                lista.append(i)
+        if tipo == 0:
+            print("\nLos artículos más vendidos son: ")             
+        else:
+            print(f"\nLos artículos más vendidos de tipo '{tipo}' son:")
+        for i in lista:
+                print(f">> {i}")
+    else:
+        print(f"\nNo se han generado ventas de artículos de categoría '{tipo}'")   
+
+
+def Calcular_Articulo_Mas_Vendido():
+    opcion = 0
+    cantidad_pedidos = Contar("PEDIDOS")
+    if cantidad_pedidos[0][0] != 0:
+        while opcion != 3:
+            print("\n1. Consultar artículo más vendido.")
+            print("2. Consultar artículo más vendido según el tipo.")
+            print("3. Volver al menú principal.")
+
+            opcion = Ingresar_Entero("\nIngrese opción de menú: ", ">> Opción de menú no válida", 1, 3)
+
+            if opcion == 1:            
+                productos = Consultar_Tabla("PEDIDOS")
+                Articulo_Mas_Vendido(productos)
+            elif opcion == 2:
+                tipo_ingresado = Ingresar_Tipo("\nIngrese el tipo de producto que desee consultar: ", ">> Artículo no válido", "lacteos",
+                "verduleria",
+                "secos",
+                "higiene",
+                "carnes",
+                "bebidas",
+                "vinos",
+                "latas",
+                "galletitas")
+                productos = Consultar_Producto("PRODUCTOS", "Tipo", tipo_ingresado)
+                
+                Articulo_Mas_Vendido(productos, tipo_ingresado)
+
+    else:
+        print("\nAún no se han generado ventas.")
