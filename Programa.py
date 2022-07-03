@@ -38,8 +38,8 @@ while opcion != 10  :
     elif opcion == 2:
         Menu_Ordenes_Ventas()
     elif opcion == 3:
-        Ingresar_Valores("PRODUCTOS", lista)
-        #Ingresar_Nuevo_Producto()      
+        #Ingresar_Valores("PRODUCTOS", lista)
+        Ingresar_Nuevo_Producto()      
     elif opcion == 4:
         Menu_Eliminar_Producto()
     elif opcion == 6:

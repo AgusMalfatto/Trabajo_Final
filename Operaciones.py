@@ -3,6 +3,7 @@ from Ingresar_Datos import *
 
 # PERMITE INGRESAR LOS DATOS DE UN NUEVO PRODUCTO
 def Ingresar_Nuevo_Producto():
+    print("\n-------------- INGRESAR NUEVO PRODUCTO --------------\n")
     tipos = (
         "lacteos",
         "verduleria",
@@ -54,23 +55,25 @@ def Calcular_Porcentaje(precio, porcentaje, codigo):
     Modificar_Valores("PRODUCTOS", codigo, "Precio", precio, "Codigo")
 
 def Menu_Modificar_Precio(codigo):
+    print("\n-------------- MENU MODIFICAR PRECIO --------------\n")
     producto = Consultar_Producto("PRODUCTOS", "Codigo", codigo)
     print("\n1. Colocar nuevo precio.")
     print("2. Actualizar con porcentaje.")
 
-    opcion = Ingresar_Entero("Ingrese opción: ", ">> Opcion no válida", 1, 2)
+    opcion = Ingresar_Entero("\nIngrese opción: ", ">> Opcion no válida", 1, 2)
 
     if opcion == 1:
-        Modificar(Ingresar_Precio, codigo, "Precio", "Ingrese el nuevo precio: ", ">> Precio no válido.", 1, 30)
+        Modificar(Ingresar_Precio, codigo, "Precio", "\nIngrese el nuevo precio: ", ">> Precio no válido.", 1, 30)
     elif opcion == 2:
-        porcentaje = Ingresar_Entero("Ingrese el porcentaje de aumento: ", ">> Porcentaje no válido.", 1, 200)
+        porcentaje = Ingresar_Entero("\nIngrese el porcentaje de aumento: ", ">> Porcentaje no válido.", 1, 200)
         Calcular_Porcentaje(producto[0][3], porcentaje, codigo)
 
 
-def Menu_Modificar(codigo):
+def Menu_Modificar(codigo, producto):
     opcion = 0
 
     while opcion != 4:
+        print("\n-------------- MENÚ MODIFICACIONES --------------\n")
         print("\n1. MODIFICAR STOCK.")
         print("2. MODIFICAR PRECIO.")
         print("3. MODIFICAR DESCUENTO.")
@@ -80,10 +83,13 @@ def Menu_Modificar(codigo):
 
         if opcion == 1:
             Modificar(Ingresar_Entero, codigo, "Stock", "\nIngresar el nuevo stock: ", ">> Valor no válido.", 1, 50)
+            print(f"\nSe ha modificado el stock del producto '{producto}'")
         elif opcion == 2:
             Menu_Modificar_Precio(codigo)
+            print(f"\nSe ha modificado el precio del producto '{producto}'")
         elif opcion == 3:
-            Modificar(Ingresar_Entero, codigo, "Descuento", "\nIngresar el nuevo descuento", "\n>> Descuento no válido.", 0, 90)
+            Modificar(Ingresar_Entero, codigo, "Descuento", "\nIngresar el nuevo descuento: ", "\n>> Descuento no válido.", 0, 90)
+            print(f"\nSe ha modificado el descuento del producto '{producto}'")
 
 
 def Menu_Modificaciones():    
@@ -92,42 +98,42 @@ def Menu_Modificaciones():
     while opcion.lower() == 'si':
         Mostrar_Tabla("PRODUCTOS")
         min, max = Seleccionar_Orden("MIN", "Codigo", "PRODUCTOS"), Seleccionar_Orden("MAX", "Codigo", "PRODUCTOS")
-        codigo = Ingresar_Entero("Ingrese código del producto a modificar: ", "Código incorrecto.", int(min[0][0]), int(max[0][0]))
-
-        Menu_Modificar(codigo)
-
-        opcion = Ingresar_Tipo("Desea modificar un nuevo producto: ", "Respuesta incorrecta ('si' o 'no')", 'si', 'no')
+        codigo = Ingresar_Entero("\nIngrese código del producto a modificar: ", "Código incorrecto.", int(min[0][0]), int(max[0][0]))
+        consulta = Consultar_Producto("PRODUCTOS", "Codigo", codigo)
+        if not(consulta[0][0] is None):
+            Menu_Modificar(codigo, consulta[0][1])
+            opcion = Ingresar_Tipo("\nDesea modificar un nuevo producto: ", "Respuesta incorrecta ('si' o 'no')", 'si', 'no')
+        else:
+            print(f"\nNo se encuentra el producto '{consulta[0][1]}' en Stock.\n")
 
 def Menu_Eliminar_Producto():
+    print("\n-------------- ELIMINAR UN PRODUCTO --------------\n")
     Mostrar_Tabla("PRODUCTOS")
     maximo = Seleccionar_Orden("MAX", "Codigo", "PRODUCTOS")
     valor = 0
     while valor == 0:
-        orden = Ingresar_Entero("Ingrese el Código del producto a eliminar: ", ">> Código no válido o no encontrado en stock", 100, maximo[0][0])
-        consulta = Consultar_Producto("PRODUCTOS", "Codigo", orden)
+        codigo = Ingresar_Entero("\nIngrese el Código del producto a eliminar: ", ">> Código no válido o no encontrado en stock", 100, maximo[0][0])
+        consulta = Consultar_Producto("PRODUCTOS", "Codigo", codigo)
         if not(consulta[0][0] is None):
-            Eliminar_Valor("PRODUCTOS", "Codigo", orden)
+            Eliminar_Valor("PRODUCTOS", "Codigo", codigo)
+            print(f"\nEl producto '{consulta[0][1]}' ha sido eliminado correctamente.\n")
             valor = 1
         else:
-            print(f">> No se encuentra producto en stock con códgio: {orden}")
+            print(f"\n>> No se encuentra producto en stock con códgio: {codigo}")
 
 
-def Calcular_Descuento(precio_final, lista_productos):
-    for producto in lista_productos:
-        vencimiento = Consultar_Producto("PRODUCTOS", "Descripcion", producto[1])
-        vencimiento = str(vencimiento[0][4])
-        vencimiento = datetime.strptime(vencimiento, "%Y-%m-%d")
-        fecha_actual = datetime.today()
-        diferencia = vencimiento - fecha_actual
-        descuento = 0
+def Calcular_Descuento(producto):
+    vencimiento = Consultar_Producto("PRODUCTOS", "Descripcion", producto[1])
+    vencimiento = str(vencimiento[0][4])
+    vencimiento = datetime.strptime(vencimiento, "%Y-%m-%d")
+    fecha_actual = datetime.today()
+    diferencia = vencimiento - fecha_actual
+    descuento = 0
 
-        if (diferencia.days <= 7):
-            descuento = 10
-            precio_final -= (descuento * precio_final) / 100
-            break
+    if (diferencia.days <= 7):
+        descuento = 10
 
-    return (precio_final, descuento)
-
+    return descuento
 
 def Articulo_Mas_Vendido(productos, tipo = 0):
     dic = dict()
@@ -154,6 +160,7 @@ def Articulo_Mas_Vendido(productos, tipo = 0):
 
 
 def Calcular_Articulo_Mas_Vendido():
+    print("\n-------------- MENÚ ARTÍCULOS MÁS VENDIDOS --------------\n")
     opcion = 0
     cantidad_pedidos = Contar("PEDIDOS")
     if cantidad_pedidos[0][0] != 0:

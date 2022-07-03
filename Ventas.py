@@ -18,10 +18,13 @@ def Mostrar_Ticket(cantidad, lista):
     print("| {:<10} | {:<15} | {:<10} |".format(cantidad, lista[0][1], lista[0][3]))
 
 def Calcular_Precio_Con_Descuento(producto, cantidad):
-    if producto[5] == 0:
+    descuento_producto = producto[5]
+    descuento_por_vencimiento = Calcular_Descuento(producto)
+    descuento_total = descuento_producto + descuento_por_vencimiento
+    if descuento_total == 0:
         precio =  producto[3] * cantidad
-    else:
-        precio = (producto[3] - (producto[3] * producto[5] / 100)) * cantidad
+    else:        
+        precio = (producto[3] - (producto[3] * descuento_total / 100)) * cantidad
     
     return precio
 
@@ -73,8 +76,7 @@ def Actualizar_Ordenes_Venta(datos_cliente, orden):
     productos = Consultar_Producto("PEDIDOS", "Orden_de_Venta", orden)
     total_productos = Sumar("PEDIDOS", "CANTIDAD", "Orden_de_Venta", orden)
     total_precio = Sumar("PEDIDOS", "Precio_Total", "Orden_de_Venta", orden)
-    total_precio = Calcular_Descuento(total_precio[0][0], productos)
-    pedido = [(orden, datos_cliente[0], datos_cliente[1], datos_cliente[2], total_productos[0][0], len(productos), total_precio[0], 'No')]
+    pedido = [(orden, datos_cliente[0], datos_cliente[1], datos_cliente[2], total_productos[0][0], len(productos), total_precio[0][0], 'No')]
     Ingresar_Valores_Ordenes_Venta(pedido)
 
 # AGREGO LOS DATOS DE LA VENTA A LA BD DE PEDIDOS
@@ -89,6 +91,7 @@ def Actualizar_BD_Pedido(lista_productos, orden):
 
 # GENERA LA VENTA.
 def Generar_Orden_de_Venta():
+    print("\n-------------- GENERAR VENTAS --------------\n")
     Mostrar_Tabla("PRODUCTOS")
     compra = []
     valor = 'si'
@@ -146,6 +149,7 @@ def Entregar_Pedido():
 
 
 def Menu_Ordenes_Ventas():
+    print("\n-------------- MENÚ ÓRDENES DE VENTA --------------\n")
     cont = Contar("ORDENES_VENTA")
     if cont[0][0] != 0:        
         valor = 0

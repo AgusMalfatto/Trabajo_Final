@@ -176,8 +176,9 @@ def Consultar_Tabla(tabla):
     database.close()
     return productos
 
-# MUESTRA TODOS LOS VALORES DE UNA TABLA
+# MUESTRA TODOS LOS VALORES DE UNA TABLA 
 def Mostrar_Tabla(nombre):
+    print("\n----------------------------------------- PRODUCTOS EN STOCK  -----------------------------------------\n")
     database = sqlite3.connect('Supermercado.db')
     cursor = database.cursor()
     comando = f"SELECT * FROM {nombre}"
