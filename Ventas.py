@@ -1,11 +1,14 @@
 from Operaciones import *
 
+# MUESTRA UNA VENTA
 def Mostrar_una_Venta(prod):
     print("| {:^15} | {:^10} | {:^10} | ".format(prod[1], prod[2], prod[3]))
 
+# MUESTRA UNA ORDEN DE VENTA
 def Mostrar_Una_Orden(orden):
     print("| {:^10} | {:^20} | {:^30} | {:^10} | {:^10} | {:^10} | {:^8} | {:^10} |".format(orden[0], orden[1], orden[2], orden[3], orden[4], orden[5], orden[6], orden[7]))
 
+# CALCULA EL NÚMERO DE ORDEN DE VENTA DE UNA NUEVA VENTA
 def Numero_Orden_Venta():
     orden = Seleccionar_Orden("MAX", "Orden_de_Venta", "ORDENES_VENTA")
     if not(orden[0][0] is None):
@@ -14,9 +17,11 @@ def Numero_Orden_Venta():
         orden = 100
     return orden
 
+# MUESTRA UN PRODUCTO DEL TICKET
 def Mostrar_Ticket(cantidad, lista):
     print("| {:<10} | {:<15} | {:<10} |".format(cantidad, lista[0][1], lista[0][3]))
 
+# CALCULA EL PRECIO DE UN PRODUCTO CON DESCUENTO EN CASO DE TENERLO
 def Calcular_Precio_Con_Descuento(producto, cantidad):
     descuento_producto = producto[5]
     descuento_por_vencimiento = Calcular_Descuento(producto)
@@ -107,6 +112,7 @@ def Generar_Orden_de_Venta():
     Actualizar_Ordenes_Venta(datos_cliente, orden)
     Procesar_Venta(compra, orden)
 
+# MUESTRA LA VENTA DE UNA ORDEN DE VENTA
 def Mostrar_Ventas(orden):
     ventas = Consultar_Producto("PEDIDOS", "Orden_de_Venta", orden)
     cliente = Consultar_Producto("ORDENES_VENTA", "Orden_de_Venta", orden)
@@ -120,7 +126,7 @@ def Mostrar_Ventas(orden):
     print("+ {:-<15} + {:-<10} + {:-<10} +".format("", "", "")) 
     print("\n*******************************************")
 
-
+# MUESTRA TODAS LAS ORDENES DE VENTA
 def Mostrar_Ordenes_Venta():
     pedidos = Consultar_Tabla("ORDENES_VENTA")
     print("\n+ {:-<10} + {:-<20} + {:-<30} + {:-<10} + {:-<10} + {:-<10} + {:-<8} + {:-<10} +".format("", "", "", "", "", "", "", ""))
@@ -131,12 +137,13 @@ def Mostrar_Ordenes_Venta():
         Mostrar_Una_Orden(orden)
     print("+ {:-<10} + {:-<20} + {:-<30} + {:-<10} + {:-<10} + {:-<10} + {:-<8} + {:-<10} +".format("", "", "", "", "", "", "", ""))
 
-
+# MUESTRA EL LISTADO COMPLETO DE LAS ORDENES DE VENTA
 def Consultar_Orden_Venta():
     maximo = Seleccionar_Orden("MAX", "Orden_de_Venta", "ORDENES_VENTA")
     orden = Ingresar_Entero("Ingrese la orden de venta: ", "Orden de venta no válida", 100, maximo[0][0])
     Mostrar_Ventas(orden)
 
+# CAMBIA LA CARACTERÍSTICA DE 'ENTREGADO' EN LA BD A 'SI'
 def Entregar_Pedido():
     maximo = Seleccionar_Orden("MAX", "Orden_de_Venta", "ORDENES_VENTA")
     orden = Ingresar_Entero("Ingrese la orden de venta: ", "Orden de venta no válida", 100, maximo[0][0])
@@ -147,7 +154,7 @@ def Entregar_Pedido():
     else:
         print("\nEl pedido ya ha sido enviado.\n")
 
-
+# MENÚ PARA LAS VENTAS
 def Menu_Ordenes_Ventas():
     print("\n-------------- MENÚ ÓRDENES DE VENTA --------------\n")
     cont = Contar("ORDENES_VENTA")
@@ -160,7 +167,7 @@ def Menu_Ordenes_Ventas():
             print("3. Entregar pedido.")
             print("4. Volver al menú.")
 
-            valor = Ingresar_Entero("\nIngrese opción de menú: ", "\nOpción de menú incorrecta", 1, 4)
+            valor = Ingresar_Entero("\nIngrese opción de menú: ", ">> Opción de menú incorrecta", 1, 4)
 
             if valor == 1:
                 Consultar_Orden_Venta()
@@ -171,3 +178,5 @@ def Menu_Ordenes_Ventas():
             
     else:
         print("\nAún no se han generado ventas.\n")
+
+

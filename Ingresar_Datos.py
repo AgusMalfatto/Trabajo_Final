@@ -1,8 +1,6 @@
 from datetime import date, datetime
 from Tablas import *
 
-'''from Trabajo_Final.Tablas import Contar, Seleccionar_Orden'''
-
 # DEFINE EL CÓDIGO DE UN NUEVO PRODUCTO
 def Definir_Codigo():
     orden = Seleccionar_Orden("MAX", "Codigo", "PRODUCTOS")

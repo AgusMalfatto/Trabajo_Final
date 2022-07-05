@@ -11,11 +11,11 @@ def Crear_DB():
     database.close()
 
 # CREA UNA TABLA CON NOMBRE ENVIADO COMO PARÁMETRO
-def Crear_Tabla(nombre):
+def Crear_Tabla(tabla):
     database = sqlite3.connect('Supermercado.db')
     cursor = database.cursor()
     cursor.execute(
-        "CREATE TABLE IF NOT EXISTS " + nombre + """(
+        "CREATE TABLE IF NOT EXISTS " + tabla + """(
             Codigo integer,
             Descripcion text,
             Stock integer,
@@ -68,10 +68,10 @@ def Crear_Tabla_Pedidos():
     database.close()
 
 # INGRESA UN SOLO VALOR CON CADA CAMPO ENVIADO COMO PARÁMTERO
-def Ingresar_Valor(nombre, codigo, descripcion, cantidad, precio, fecha, descuento, tipo):
+def Ingresar_Valor(tabla, codigo, descripcion, cantidad, precio, fecha, descuento, tipo):
     conexion = sqlite3.connect('Supermercado.db')
     cursor = conexion.cursor()
-    comando = f"INSERT INTO {nombre} VALUES ('{codigo}', '{descripcion}', '{cantidad}', '{precio}', '{fecha}', '{descuento}', '{tipo}')"
+    comando = f"INSERT INTO {tabla} VALUES ('{codigo}', '{descripcion}', '{cantidad}', '{precio}', '{fecha}', '{descuento}', '{tipo}')"
     # Insertamos un registro en la tabla de usuarios
     cursor.execute(comando)
     # Guardamos los cambios haciendo un commit
@@ -96,6 +96,15 @@ def Ingresar_Valores_Pedidos(values):
     conexion.commit()
     conexion.close()
 
+# INGRESA MUCHOS VALORES A LA VEZ ENVÍADOS COMO PARÁMETROS EN FORMA DE LISTA DE TUPLAS
+def Ingresar_Valores(tabla, values):
+    conexion = sqlite3.connect('Supermercado.db')
+    cursor = conexion.cursor()
+    comando = f"INSERT INTO {tabla} VALUES (?, ?, ?, ?, ?, ?, ?)"
+    cursor.executemany(comando, values)
+    conexion.commit()
+    conexion.close()
+
 # SUMA LOS ELEMENTO DE UNA TABLA DE UNA COLUMNA ENVÍADA COMO PARÁMETRO. RETORNA UN VALOR EN UNA TUPLA DENTRO DE UNA LISTA
 def Sumar(tabla, columna, columna_orden, orden):
     database = sqlite3.connect('Supermercado.db')
@@ -106,15 +115,6 @@ def Sumar(tabla, columna, columna_orden, orden):
     database.commit()
     database.close()
     return producto
-
-# INGRESA MUCHOS VALORES A LA VEZ ENVÍADOS COMO PARÁMETROS EN FORMA DE LISTA DE TUPLAS
-def Ingresar_Valores(nombre, values):
-    conexion = sqlite3.connect('Supermercado.db')
-    cursor = conexion.cursor()
-    comando = f"INSERT INTO {nombre} VALUES (?, ?, ?, ?, ?, ?, ?)"
-    cursor.executemany(comando, values)
-    conexion.commit()
-    conexion.close()
 
 # MODIFICA UN ELEMENTO BASADO EN SU CÓDIGO, SE PASA EL ASPECTO A MODIFICAR Y SU NUEVO VALOR
 def Modificar_Valores(tabla, codigo, columna, nuevo_valor, columna_codigo):
@@ -145,6 +145,17 @@ def Consultar_Producto(tabla, columna, valor):
     database.close()
     return producto
 
+# BUSCA LOS PRODUCTOS QUE ESTÉN VENCIDOS, LOS DEVUELVE COMO LISTA DE TUPLAS
+def Consultar_Producto_Vencido(tabla, valor):
+    database = sqlite3.connect('Supermercado.db')
+    cursor = database.cursor()
+    comando = f"SELECT * FROM {tabla} WHERE Vencimiento < '{valor}'"
+    cursor.execute(comando)
+    producto = cursor.fetchall()
+    database.commit()
+    database.close()
+    return producto
+
 # DEVUELVE EL MÁXIMO O EL MÍNIMO VALOR DE LAS ORDENES DE VENTA
 def Seleccionar_Orden(valor, columna, tabla):
     database = sqlite3.connect('Supermercado.db')
@@ -156,6 +167,7 @@ def Seleccionar_Orden(valor, columna, tabla):
     database.close()
     return producto
 
+# CUENTA LOS REGISTROS ALMACENADOS EN UNA TABLA
 def Contar(tabla):
     database = sqlite3.connect('Supermercado.db')
     cursor = database.cursor()
@@ -166,6 +178,7 @@ def Contar(tabla):
     database.close()
     return cantidad
 
+# SELECCIONA TODOS LOS REGISTROS DE UNA TABLA ENVÍADA COMO PARÁMETRO
 def Consultar_Tabla(tabla):
     database = sqlite3.connect('Supermercado.db')
     cursor = database.cursor()

@@ -5,7 +5,9 @@ Crear_Tabla("PRODUCTOS")
 Crear_Tabla("VENCIDOS")
 Crear_Tabla_Pedidos()
 Crear_Tabla_Ordenes_Venta()
+
 opcion = 0
+
 lista = [
     (103, "ARVEJA", 35, 1, "2026-05-21", 0, "LATAS"),
     (104, "DULCE DE LECHE", 15, 2.5, "2022-12-25", 0, "LACTEOS"),
@@ -16,11 +18,15 @@ lista = [
     (109, "FIDEOS", 15, 3, "2023-02-11", 0, 'SECOS'),
     (110, "MANTECA", 16, 4, "2022-12-25", 0, 'LACTEOS')
 ]
+
+# SI LA TABLA 'PRODUCTOS ESTÁ VACÍA, AGREGA LOS PRODUCTOS AUTOMÁTICAMENTE
 if (Contar("PRODUCTOS"))[0][0] == 0:
     Ingresar_Valores("PRODUCTOS", lista)
-while opcion != 10  :
+
+while opcion != 10:
     print("\n-------------- MENÚ PRINCIPAL --------------\n")
-    print("\n1. GENERAR VENTA")
+    print("\n0. RECARGAR MÓDULOS")
+    print("1. GENERAR VENTA")
     print("2. CONSULTA PEDIDOS")
     print("3. AGREGAR PRODUCTO")
     print("4. ELIMINAR UN PRODUCTO")
@@ -31,9 +37,11 @@ while opcion != 10  :
     print("9. ARTÍCULO MÁS VENDIDO")
     print("10. SALIR DEL SISTEMA\n")
 
-    opcion = Ingresar_Entero("\nIngrese opción de Menú: ", "\nOpción incorrecta.", 1, 10)
+    opcion = Ingresar_Entero("\nIngrese opción de Menú: ", "\nOpción incorrecta.", 0, 10)
     
-    if opcion == 1:
+    if opcion == 0:
+        Recargar_Modulos()
+    elif opcion == 1:
         Generar_Orden_de_Venta()
     elif opcion == 2:
         Menu_Ordenes_Ventas()
@@ -42,7 +50,9 @@ while opcion != 10  :
     elif opcion == 4:
         Menu_Eliminar_Producto()
     elif opcion == 6:
-        Mostrar_Tabla("PRODUCTOS")
+        Listado_Stock()
+    elif opcion == 7:
+        Menu_Consultar_Stock()
     elif opcion == 8: 
         Menu_Modificaciones()
     elif opcion == 9:

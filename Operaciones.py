@@ -20,11 +20,12 @@ def Ingresar_Nuevo_Producto():
     cantidad = Ingresar_Entero("Ingrese cantidad de productos: ", "Cantidad no válida", 1, 50)
     precio = Ingresar_Precio("Ingrese el precio del producto: ", "Precio no válido", 1, 30)
     fecha = Ingresar_Fecha()
-    descuento = Ingresar_Entero("\nIngrese el descuento del producto (en caso de no tener descuento ingrese 'cero'): ", "\n>> Descuento no válido.", 0, 90)
+    descuento = Ingresar_Entero("Ingrese el descuento del producto (en caso de no tener descuento ingrese 'cero'): ", "\n>> Descuento no válido.", 0, 90)
+    print("\n")
     for i in tipos:
         print(f"{i} - ", end="")
 
-    tipo = Ingresar_Tipo("Ingrese el tipo del producto: ", "Tipo no válido", 
+    tipo = Ingresar_Tipo("\nIngrese el tipo del producto: ", "Tipo no válido", 
         "lacteos",
         "verduleria",
         "secos",
@@ -36,7 +37,7 @@ def Ingresar_Nuevo_Producto():
         "galletitas"
         )
 
-    Ingresar_Valor("PRODUCTOS", codigo, descripcion.upper(), cantidad, precio, fecha, descuento, tipo)
+    Ingresar_Valor("PRODUCTOS", codigo, descripcion.upper(), cantidad, precio, fecha, descuento, tipo.upper())
 
 # CONSULTA EL STOCK DE UN PRODUCTO. DEVUELVE LISTA DE TUPLA VACÍA SI NO HAY STOCK. DEVUELVE DATOS DEL PRODUCTO SI HAY STOCK.
 def Validar_Stock(prod):
@@ -46,14 +47,17 @@ def Validar_Stock(prod):
         consulta = stock
     return consulta
 
+# SOLICITA EL NUEVO VALOR Y MODIFICA LA BD
 def Modificar(*args): # funcion, codigo, columna, 
     valor = args[0](args[3], args[4], args[5], args[6])
     Modificar_Valores("PRODUCTOS", args[1], args[2], valor, "Codigo")
 
+# MODIFICA EL PRECIO DEL PRODUCTO SEGÚN UN PORCENTAJE RECIBIDO
 def Calcular_Porcentaje(precio, porcentaje, codigo):
     precio += (precio * porcentaje / 100)
     Modificar_Valores("PRODUCTOS", codigo, "Precio", precio, "Codigo")
 
+# MENÚ PARA MODIFICAR UN PRECIO
 def Menu_Modificar_Precio(codigo):
     print("\n-------------- MENU MODIFICAR PRECIO --------------\n")
     producto = Consultar_Producto("PRODUCTOS", "Codigo", codigo)
@@ -68,7 +72,7 @@ def Menu_Modificar_Precio(codigo):
         porcentaje = Ingresar_Entero("\nIngrese el porcentaje de aumento: ", ">> Porcentaje no válido.", 1, 200)
         Calcular_Porcentaje(producto[0][3], porcentaje, codigo)
 
-
+# MENÚ PARA MODIFICAR UN PRODUCTO RECIBIDO CÓMO PARÁMETRO
 def Menu_Modificar(codigo, producto):
     opcion = 0
 
@@ -91,7 +95,7 @@ def Menu_Modificar(codigo, producto):
             Modificar(Ingresar_Entero, codigo, "Descuento", "\nIngresar el nuevo descuento: ", "\n>> Descuento no válido.", 0, 90)
             print(f"\nSe ha modificado el descuento del producto '{producto}'")
 
-
+# MENÚ PARA MODIFICAR PRODUCTOS
 def Menu_Modificaciones():    
     opcion = 'si'
 
@@ -106,22 +110,21 @@ def Menu_Modificaciones():
         else:
             print(f"\nNo se encuentra el producto '{consulta[0][1]}' en Stock.\n")
 
+# ELIMINA UN PRODUCTO DE LA BD
 def Menu_Eliminar_Producto():
     print("\n-------------- ELIMINAR UN PRODUCTO --------------\n")
     Mostrar_Tabla("PRODUCTOS")
     maximo = Seleccionar_Orden("MAX", "Codigo", "PRODUCTOS")
-    valor = 0
-    while valor == 0:
-        codigo = Ingresar_Entero("\nIngrese el Código del producto a eliminar: ", ">> Código no válido o no encontrado en stock", 100, maximo[0][0])
-        consulta = Consultar_Producto("PRODUCTOS", "Codigo", codigo)
-        if not(consulta[0][0] is None):
-            Eliminar_Valor("PRODUCTOS", "Codigo", codigo)
-            print(f"\nEl producto '{consulta[0][1]}' ha sido eliminado correctamente.\n")
-            valor = 1
-        else:
-            print(f"\n>> No se encuentra producto en stock con códgio: {codigo}")
+    codigo = Ingresar_Entero("\nIngrese el Código del producto a eliminar: ", ">> Código no válido o no encontrado en stock", 100, maximo[0][0])
+    consulta = Consultar_Producto("PRODUCTOS", "Codigo", codigo)
+    if not(consulta[0][0] is None):
+        Eliminar_Valor("PRODUCTOS", "Codigo", codigo)
+        print(f"\nEl producto '{consulta[0][1]}' ha sido eliminado correctamente.\n")
+        valor = 1
+    else:
+        print(f"\n>> No se encuentra producto en stock con códgio: {codigo}")
 
-
+# CALCULA EL DESCUENTO DE UN PRODUCTO ENVÍADO COMO PARÁMETRO SEGÚN SU FECHA DE VENCIMIENTO
 def Calcular_Descuento(producto):
     vencimiento = Consultar_Producto("PRODUCTOS", "Descripcion", producto[1])
     vencimiento = str(vencimiento[0][4])
@@ -135,6 +138,7 @@ def Calcular_Descuento(producto):
 
     return descuento
 
+# DETERMINA EL ARTÍCULO MÁS VENDIDO
 def Articulo_Mas_Vendido(productos, tipo = 0):
     dic = dict()
     for un_producto in productos:
@@ -158,8 +162,9 @@ def Articulo_Mas_Vendido(productos, tipo = 0):
     else:
         print(f"\nNo se han generado ventas de artículos de categoría '{tipo}'")   
 
-
+# MENÚ PARA BUSCAR EL ARTÍCULO MÁS VENDIDO
 def Calcular_Articulo_Mas_Vendido():
+
     print("\n-------------- MENÚ ARTÍCULOS MÁS VENDIDOS --------------\n")
     opcion = 0
     cantidad_pedidos = Contar("PEDIDOS")
@@ -189,4 +194,70 @@ def Calcular_Articulo_Mas_Vendido():
                 Articulo_Mas_Vendido(productos, tipo_ingresado)
 
     else:
-        print("\nAún no se han generado ventas.")
+        print("\nAún no se han generado ventas.\n")
+
+# MUESTRA LA CONSULTA DE STOCK
+def Mostrar_Consulta(columna, consulta):
+    producto_consultado = Consultar_Producto("PRODUCTOS", columna, consulta)
+    if len(producto_consultado) > 0:
+        print("\n+ {:-<8} + {:-<20} + {:-<8} + {:-<8} + {:-<13} + {:-<10} + {:-<15} +".format ("", "", "", "", "", "", ""))
+        print("| {:^8} | {:^20} | {:^8} | {:^8} | {:^13} | {:^10} | {:^15} |".format ("CÓDIGO", "DESCRIPCIÓN", "STOCK", "PRECIO", "VENCIMIENTO", "DESCUENTO", "TIPO"))
+        print("+ {:-<8} + {:-<20} + {:-<8} + {:-<8} + {:-<13} + {:-<10} + {:-<15} +".format ("", "", "", "", "", "", ""))
+        for i in producto_consultado:
+            Mostrar_Un_Producto(i)
+
+        print("+ {:-<8} + {:-<20} + {:-<8} + {:-<8} + {:-<13} + {:-<10} + {:-<15} +\n".format ("", "", "", "", "", "", ""))
+    else:
+        print(f"\nNo se ha encontrado producto con {columna}: {consulta}")
+
+# MENÚ PARA CONSULTAR EL STOCK
+def Menu_Consultar_Stock():
+    opcion = 0
+
+    while opcion != 3:
+        print("\n------------ MENU CONSULTA DE STOCK ------------\n")
+        print("\n1. Consultar por código.")
+        print("2. Consultar por descripción.")
+        print("3. Volver al menú principal.")
+
+        opcion = Ingresar_Entero("\nIngrese opción de menú: ", ">> Opción de menú no válida.", 1, 3)
+        
+        if opcion == 1:
+            consulta = Ingresar_Entero("\nIngrese el cóodigo del producto: ", ">> Código no válido.", 100, 9000)
+            Mostrar_Consulta("Codigo", consulta)
+        elif opcion == 2:
+            consulta = Ingresar_Cadena("\nIngrese la descripción del producto: ")
+            Mostrar_Consulta("Descripcion", consulta)
+
+# ELIMINA LOS PRODUCTOS VENCIDOS DE LA BD 'PRODUCTOS' Y LAS AGREGA A LA BD 'VENCIDOS'
+def Recargar_Modulos():
+    fecha_actual = datetime.today()
+    productos = Consultar_Producto_Vencido("PRODUCTOS", fecha_actual)
+    if len(productos) > 0:
+        for prod in productos:
+            Eliminar_Valor("PRODUCTOS", "Codigo", prod[0])
+        Ingresar_Valores("VENCIDOS", productos)
+        print("\nMódulos recargados correctamente.")
+    else:
+        print("\nNo hay productos vencidos hasta la fecha.")
+    
+# LISTA TODOS LOS PRODUCTOS EN STOCK O LOS PRODUCTOS VENCIDOS
+def Listado_Stock():
+    opcion = 0
+
+    while opcion != 3:
+        print("\n------------ MENÚ LISTADO DE PRODUCTOS ------------\n")
+        print("\n1. Mostrar listado de productos en Stock.")
+        print("2. Mostrar listado de productos vencidos.")
+        print("3. Volver al menú principal.")
+
+        opcion = Ingresar_Entero("\nIngrese opción de menú: ", ">> Opción de menú incorrecta", 1, 3)
+
+        if opcion == 1:
+            Mostrar_Tabla("PRODUCTOS")
+        elif opcion == 2:
+            cantidad = Contar("VENCIDOS")
+            if cantidad[0][0] != 0:
+                Mostrar_Tabla("VENCIDOS")
+            else:
+                print("\nNo se han registrado productos vencidos.")
